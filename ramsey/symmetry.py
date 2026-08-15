@@ -17,6 +17,7 @@ Only one break is implemented, deliberately: the colours along the edges
 leaving vertex 0 are non-decreasing. Vertices 1..n-1 may be permuted freely,
 so every good colouring has a representative in this form.
 """
+from itertools import pairwise
 
 
 def sorted_star_clauses(enc):
@@ -27,7 +28,7 @@ def sorted_star_clauses(enc):
     """
     clauses = []
     star = [(0, v) for v in range(1, enc.n)]
-    for a, b in zip(star, star[1:]):
+    for a, b in pairwise(star):
         for hi in range(1, 3):
             for lo in range(hi):
                 clauses.append([-enc.var(a, hi), -enc.var(b, lo)])

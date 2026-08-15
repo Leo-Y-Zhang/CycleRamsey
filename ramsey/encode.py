@@ -11,7 +11,7 @@ breaking here on purpose: a proof of a symmetry-broken formula does not prove
 the original statement, and the refutations this repository certifies have to
 be refutations of the real question.
 """
-from .cycles import cycles, cycle_edges, edges
+from .cycles import cycle_edges, cycles, edges
 
 NUM_COLOURS = 3
 

@@ -15,9 +15,9 @@ import time
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ramsey.encode import Encoding                      # noqa: E402
-from ramsey.verify_witness import check_colouring       # noqa: E402
-from ramsey import symmetry                             # noqa: E402
+from ramsey import symmetry
+from ramsey.encode import Encoding
+from ramsey.verify_witness import check_colouring
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EVIDENCE = os.path.join(HERE, 'evidence')

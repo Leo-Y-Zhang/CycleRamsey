@@ -1,0 +1,55 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: read
+
+jobs:
+  # verify_all.py IS the gate, and it needs no solver: it compares the cycle
+  # enumeration against a closed-form count it did not come from, makes the
+  # witness checker catch a planted cycle and then miss it once an edge is
+  # broken, and re-verifies every stored colouring before mutating it edge by
+  # edge. Running it here means a push cannot quietly break a claim the README
+  # makes.
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: python ramsey/verify_all.py
+
+  # Pinned deliberately, and to the version ruff.toml was validated against. An
+  # unpinned lint grades the code against whatever shipped that morning, which
+  # makes a red run say nothing about the commit. Bump this and ruff.toml
+  # together.
+  lint:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v6
+        with:
+          python-version: "3.13"
+      - run: pip install ruff==0.16.1
+      - run: ruff check .
+
+  gitleaks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+      - uses: gitleaks/gitleaks-action@v3
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

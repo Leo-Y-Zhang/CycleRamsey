@@ -24,7 +24,7 @@ def cycles(n, length):
         head, rest = subset[0], subset[1:]
         for tail in permutations(rest):
             if tail[0] < tail[-1]:
-                yield (head,) + tail
+                yield (head, *tail)
 
 
 def cycle_count(n, length):

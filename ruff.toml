@@ -1,0 +1,14 @@
+# The rule set is stated here rather than left to whatever ruff CI happens to
+# install. A sibling repository of mine once linted clean locally and failed
+# with 55 errors in CI on the same commit, because the two machines had picked
+# up different ruff versions. The workflow pins the version this file was
+# validated against; bump both together or not at all.
+
+target-version = "py313"
+line-length = 100
+
+[lint]
+# E/F pycodestyle and pyflakes, the baseline. I deterministic import order.
+# UP legacy spellings, since this is py313-only. B bugbear, real defects rather
+# than style. RUF ruff's own rules, including RUF100 for noqa that does nothing.
+select = ["E", "F", "I", "UP", "B", "RUF"]

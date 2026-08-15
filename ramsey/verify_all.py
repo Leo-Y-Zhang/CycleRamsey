@@ -17,10 +17,10 @@ import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from ramsey.cycles import cycles, cycle_count, cycle_edges, edges  # noqa: E402
-from ramsey.encode import Encoding                                 # noqa: E402
-from ramsey.verify_witness import check_colouring, find_cycle, is_good  # noqa: E402
-from ramsey import symmetry                                        # noqa: E402
+from ramsey import symmetry
+from ramsey.cycles import cycle_count, cycle_edges, cycles, edges
+from ramsey.encode import Encoding
+from ramsey.verify_witness import find_cycle, is_good
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EVIDENCE = os.path.join(HERE, 'evidence')
@@ -76,7 +76,7 @@ def main():
     for n, targets in [(8, (3, 6, 6)), (10, (4, 6, 6))]:
         enc = Encoding(n, targets)
         expect = len(edges(n)) * 4  # one at-least-one + three at-most-one
-        for colour, L in enumerate(targets):
+        for L in targets:
             expect += cycle_count(n, L)
         check(f'K_{n} {targets}: {len(enc.clauses)} clauses == predicted',
               len(enc.clauses) == expect)
@@ -115,7 +115,16 @@ def main():
         name = os.path.basename(path)
         n, targets = rec['n'], tuple(rec['targets'])
         order = edges(n)
-        colouring = {e: int(c) for e, c in zip(order, rec['colouring'])}
+        # One character per edge, checked rather than assumed. A stored string
+        # of the wrong length would otherwise be zipped against the edge list
+        # and verified over whichever prefix happened to line up, which is a
+        # pass that means nothing. strict= below is the backstop.
+        sized = len(rec['colouring']) == len(order)
+        check(f'{name}: colouring is one character per edge '
+              f'({len(rec["colouring"])} of {len(order)})', sized)
+        if not sized:
+            continue
+        colouring = {e: int(c) for e, c in zip(order, rec['colouring'], strict=True)}
         check(f'{name}: colouring re-verified solver-free',
               is_good(n, colouring, targets))
         # Recolouring every edge one colour on must break it, or the check
@@ -144,7 +153,9 @@ def main():
         if rec.get('verdict') != 'SAT_WITNESS_VERIFIED':
             continue
         n = rec['n']
-        colouring = {e: int(c) for e, c in zip(edges(n), rec['colouring'])}
+        if len(rec['colouring']) != len(edges(n)):
+            continue  # already reported as a failure by the section above
+        colouring = {e: int(c) for e, c in zip(edges(n), rec['colouring'], strict=True)}
         canon = symmetry.canonicalise(n, colouring)
         star = [canon[(0, v)] for v in range(1, n)]
         check(f'{os.path.basename(path)}: canonical star is sorted {star}',

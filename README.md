@@ -63,7 +63,7 @@ The clause counts were never the constraint. The symmetry is.
 python ramsey/verify_all.py
 ```
 
-35 checks, no solver required: the enumeration is compared against a formula,
+55 checks, no solver required: the enumeration is compared against a formula,
 the witness checker is made to catch a planted cycle and to miss it once an
 edge is broken, and every stored colouring is re-verified and then mutated
 edge by edge to confirm the check can actually fail. Sections needing kissat

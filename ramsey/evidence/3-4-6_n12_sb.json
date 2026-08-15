@@ -1,0 +1,20 @@
+{
+ "problem": "R(C3,C4,C6)",
+ "n": 12,
+ "targets": [
+  3,
+  4,
+  6
+ ],
+ "vars": 198,
+ "clauses": 57439,
+ "build_s": 0.1,
+ "solve_s": 0.1,
+ "returncode": 10,
+ "timed_out": false,
+ "encoding": "one-hot, sorted-star symmetry break",
+ "symmetry_clauses": 30,
+ "sat": true,
+ "verdict": "SAT_WITNESS_VERIFIED",
+ "colouring": "000001111122121012000221001000210021001002010021000202112222200222"
+}

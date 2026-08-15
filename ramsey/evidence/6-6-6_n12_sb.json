@@ -1,0 +1,18 @@
+{
+ "problem": "R(C6,C6,C6)",
+ "n": 12,
+ "targets": [
+  6,
+  6,
+  6
+ ],
+ "vars": 198,
+ "clauses": 166614,
+ "build_s": 0.3,
+ "solve_s": 400.0,
+ "returncode": null,
+ "timed_out": true,
+ "encoding": "one-hot, sorted-star symmetry break",
+ "symmetry_clauses": 30,
+ "verdict": "TIMEOUT"
+}

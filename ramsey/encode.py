@@ -22,6 +22,12 @@ class Encoding:
     def __init__(self, n, targets):
         if len(targets) != NUM_COLOURS:
             raise ValueError('exactly three target cycle lengths are required')
+        # A cycle has at least three vertices. Below that `cycles` yields
+        # nothing, so the colour would simply go unconstrained and the formula
+        # would be satisfiable for a question nobody asked.
+        if any(t < 3 for t in targets):
+            raise ValueError(
+                f'target cycle lengths must be at least 3, got {tuple(targets)}')
         self.n = n
         self.targets = tuple(targets)
         self.edges = edges(n)

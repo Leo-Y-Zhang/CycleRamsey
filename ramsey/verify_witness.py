@@ -58,6 +58,13 @@ def find_cycle(n, colouring, colour, length):
 
 def check_colouring(n, colouring, targets):
     """Raise unless `colouring` is a complete, proper, good colouring of K_n."""
+    # A ValueError and not an AssertionError, because this is not a verdict on
+    # the colouring: a target below 3 is not a cycle length, and `find_cycle`
+    # answers None for it. Reporting `is_good` False there would say the
+    # colouring failed; raising says the question cannot be answered.
+    if any(t < 3 for t in targets):
+        raise ValueError(
+            f'target cycle lengths must be at least 3, got {tuple(targets)}')
     expected = n * (n - 1) // 2
     if len(colouring) != expected:
         raise AssertionError(

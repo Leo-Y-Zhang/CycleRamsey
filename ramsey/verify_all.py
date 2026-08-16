@@ -20,7 +20,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from ramsey import symmetry
 from ramsey.cycles import cycle_count, cycle_edges, cycles, edges
 from ramsey.encode import Encoding
-from ramsey.verify_witness import find_cycle, is_good
+from ramsey.verify_witness import check_colouring, find_cycle, is_good
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 EVIDENCE = os.path.join(HERE, 'evidence')
@@ -82,6 +82,36 @@ def main():
               len(enc.clauses) == expect)
         check(f'K_{n} {targets}: {enc.num_vars} vars == 3*|E|',
               enc.num_vars == 3 * len(edges(n)))
+
+    section('a target that is not a cycle length is refused, not answered')
+    # A cycle has at least three vertices, so C_2 and C_0 are not questions
+    # about cycles at all. Both halves of this repository used to answer them
+    # anyway, and in the same direction: the encoder emitted no clauses for
+    # that colour because `cycles` yields nothing below length 3, and the
+    # checker found nothing there because `find_cycle` returns None below
+    # length 3. Two components that share no code still shared this blind
+    # spot, so solve.py reported SAT_WITNESS_VERIFIED for R(C3,C6,C2), a
+    # Ramsey number that does not exist. Refusing is the only honest answer.
+    for targets in [(3, 6, 2), (3, 6, 0), (3, 6, -1)]:
+        try:
+            Encoding(8, targets)
+            refused = False
+        except ValueError:
+            refused = True
+        check(f'encoder refuses target lengths {targets}', refused)
+    # Three perfect matchings of K_4, so no colour holds two adjacent edges and
+    # the colouring is good for anything. Only the target can be at fault here.
+    matchings = {(0, 1): 0, (2, 3): 0, (0, 2): 1, (1, 3): 1, (0, 3): 2, (1, 2): 2}
+    for targets in [(2, 2, 2), (3, 6, 1)]:
+        try:
+            check_colouring(4, matchings, targets)
+            refused = False
+        except ValueError:
+            refused = True
+        # Deliberately ValueError and not AssertionError: `is_good` turns an
+        # AssertionError into False, which would read as "this colouring is
+        # not good" rather than "this question cannot be answered".
+        check(f'witness checker refuses target lengths {targets}', refused)
 
     section('the witness checker finds cycles that are really there')
     # A monochromatic 6-cycle planted by hand must be found; the same

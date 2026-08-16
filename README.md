@@ -27,9 +27,10 @@ cycles by its own path search, sharing no code with the encoder:
 | R(C_3,C_6,C_6), n=14 | 361,088 | SAT, witness verified | 0.2 s |
 
 Every row above is the plain encoding, no symmetry breaking, and each one has
-its evidence file in `ramsey/evidence/`; the gate re-checks them all. The
-symmetry-broken runs of the same four instances are stored alongside, with the
-`_sb` suffix and a larger clause count.
+its evidence file in `ramsey/evidence/`; the gate re-checks them all. Three of
+the four also have a symmetry-broken run stored alongside, with the `_sb`
+suffix and a larger clause count; `R(C_6,C_6,C_6)` at n=11 was only ever run
+without the break.
 
 The last row confirms `R(C_3,C_6,C_6) >= 15` independently.
 
@@ -68,8 +69,10 @@ the witness checker is made to catch a planted cycle and to miss it once an
 edge is broken, every stored colouring is re-verified and then mutated
 edge by edge to confirm the check can actually fail, and both the encoder and
 the checker are asked for a target that is not a cycle length and must refuse.
-Sections needing kissat locate it via `--kissat`, `KISSAT` or `PATH` and skip
-loudly when it is absent.
+There is no solver-backed section and no section that skips: the gate takes no
+arguments, ignores any it is given, and re-checks only what is on disk. Redoing
+the SAT verdicts themselves is `ramsey/solve.py`, which does need kissat and
+finds it via `--kissat`, `KISSAT` or `PATH`.
 
 ## Honest limits
 

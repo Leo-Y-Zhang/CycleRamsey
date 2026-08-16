@@ -8,7 +8,8 @@ breaking them on purpose and requiring the break to be caught:
   * the cycle enumeration. It is compared against a closed-form count it did
     not come from, and against a brute-force search for small cases.
 
-Sections needing kissat skip LOUDLY rather than silently passing.
+Nothing here calls a solver. This module takes no arguments and re-checks only
+what is on disk; `solve.py` is what needs kissat.
 """
 import glob
 import json

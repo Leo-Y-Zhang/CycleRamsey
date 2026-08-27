@@ -35,6 +35,8 @@ PUBLISHED = {
     (4, 6, 6): 11,
     (6, 6, 6): 12,
     (3, 4, 6): 13,
+    # Wesley, arXiv:2509.03784, September 2025, which PREFLIGHT.md quotes.
+    (3, 6, 6): 15,
 }
 
 passed = failed = 0
@@ -192,10 +194,28 @@ def main():
         check(f'{os.path.basename(path)}: canonical star is sorted {star}',
               star == sorted(star))
 
-    section('published values this repository does not claim')
-    for targets, value in sorted(PUBLISHED.items()):
-        check(f'R(C{targets[0]},C{targets[1]},C{targets[2]}) = {value} '
-              f'recorded as published, not claimed', True)
+    section('stored witnesses sit under the published values, checked not asserted')
+    # A verified witness on K_n is a good colouring of K_n, so it proves R > n.
+    # That ordering against the published table is the one direction here that
+    # is an invariant, and it is where a mistyped value or a bogus witness would
+    # show. A TIMEOUT is compared against nothing: an undecided verdict implies
+    # nothing about n against R, and a hard instance below R times out honestly.
+    compared = 0
+    for path in records:
+        with open(path, encoding='utf-8') as fh:
+            rec = json.load(fh)
+        if rec.get('verdict') != 'SAT_WITNESS_VERIFIED':
+            continue
+        targets = tuple(rec['targets'])
+        if targets not in PUBLISHED:
+            continue  # no published value to sit under; not a failure
+        compared += 1
+        value = PUBLISHED[targets]
+        check(f'{os.path.basename(path)}: witness on K_{rec["n"]} is below '
+              f'published R(C{targets[0]},C{targets[1]},C{targets[2]}) = {value}',
+              rec['n'] < value)
+    check(f'at least one witness was compared to a published value '
+          f'({compared} found)', compared > 0)
 
     print(f'\n{passed} passed / {failed} failed')
     if failed:

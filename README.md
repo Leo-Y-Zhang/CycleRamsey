@@ -64,11 +64,16 @@ The clause counts were never the constraint. The symmetry is.
 python ramsey/verify_all.py
 ```
 
-67 checks, no solver required: the enumeration is compared against a formula,
+Python 3.13, which is what CI runs and what `ruff.toml` targets. Nothing is
+installed and there are no third-party packages.
+
+69 checks, no solver required: the enumeration is compared against a formula,
 the witness checker is made to catch a planted cycle and to miss it once an
 edge is broken, every stored colouring is re-verified and then mutated
-edge by edge to confirm the check can actually fail, and both the encoder and
-the checker are asked for a target that is not a cycle length and must refuse.
+edge by edge to confirm the check can actually fail, both the encoder and
+the checker are asked for a target that is not a cycle length and must refuse,
+and every verified witness is put under the published value it has to sit
+below.
 There is no solver-backed section and no section that skips: the gate takes no
 arguments, ignores any it is given, and re-checks only what is on disk. Redoing
 the SAT verdicts themselves is `ramsey/solve.py`, which does need kissat and

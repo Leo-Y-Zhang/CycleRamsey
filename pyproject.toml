@@ -1,0 +1,21 @@
+[project]
+name = "cycleramsey"
+version = "0.1.0"
+description = "Three-colour cycle Ramsey numbers as SAT, with every stored witness re-checkable without a solver."
+requires-python = ">=3.11"
+license = { text = "LicenseRef-Leo-Y-Zhang-Proprietary" }
+# No runtime dependencies. The encoder, the cycle enumeration and the witness
+# checker are standard library, so a reader can re-verify every claim in the
+# repository without installing anything -- which is the point of storing
+# witnesses at all. kissat is needed only to produce new ones, not to check them.
+dependencies = []
+
+[project.scripts]
+ramsey = "ramsey.__main__:main"
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools.packages.find]
+include = ["ramsey*"]

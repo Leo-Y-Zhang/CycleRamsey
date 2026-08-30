@@ -1,2 +1,0 @@
-[console_scripts]
-ramsey = ramsey.__main__:main

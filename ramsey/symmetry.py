@@ -9,9 +9,10 @@ satisfiability-preserving: the broken formula is satisfiable exactly when the
 raw one is, and an UNSAT of the broken formula is an UNSAT of the question.
 
 That argument is only as good as its implementation, so `verify_all.py`
-re-decides every known value both ways and requires the same verdict. A
-symmetry break that quietly removed a real colouring would show up there as a
-SAT that turned into an UNSAT.
+canonicalises every stored witness and requires the result to be both still
+good and in the broken form: a canonical form that some good colouring could
+not reach would show up there. The gate calls no solver, so it does not
+re-decide any instance with and without the break.
 
 Only one break is implemented, deliberately: the colours along the edges
 leaving vertex 0 are non-decreasing. Vertices 1..n-1 may be permuted freely,

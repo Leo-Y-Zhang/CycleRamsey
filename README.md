@@ -69,15 +69,15 @@ installed and there are no third-party packages.
 
 101 checks, no solver required: the enumeration is compared against a formula,
 the witness checker is made to catch a planted cycle and to miss it once an
-edge is broken, every stored colouring is re-verified and then mutated
-edge by edge to confirm the check can actually fail, both the encoder and
-the checker are asked for a target that is not a cycle length and must refuse,
-and every verified witness is put under the published value it has to sit
-below. The evidence directory must hold exactly the ten records this README
-and PREFLIGHT.md rely on, each with the verdict it is claimed to have, and each record's
-clause and variable counts are recomputed from the definition and its verdict
-checked against the solver's return code; an UNSAT, which has no certificate
-here, is refused rather than passed.
+edge is broken, every stored colouring is re-verified and then mutated edge by
+edge to confirm the check can actually fail, both the encoder and the checker
+are asked for a target that is not a cycle length and must refuse, and every
+verified witness is put under the published value it has to sit below. The
+evidence directory must hold exactly the ten records this README and
+PREFLIGHT.md rely on, each with the verdict it is claimed to have, and each
+record's clause and variable counts are recomputed from the definition and its
+verdict checked against the solver's return code; an UNSAT, which has no
+certificate here, is refused rather than passed.
 There is no solver-backed section and no section that skips: the gate takes no
 arguments, ignores any it is given, and re-checks only what is on disk. Redoing
 the SAT verdicts themselves is `ramsey/solve.py`, which does need kissat and

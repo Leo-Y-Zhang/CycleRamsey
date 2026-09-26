@@ -11,13 +11,18 @@ breaking them on purpose and requiring the break to be caught:
 Nothing here calls a solver. This module takes no arguments and re-checks only
 what is on disk; `solve.py` is what needs kissat.
 """
+import argparse
+import contextlib
 import glob
+import importlib
+import io
 import json
 import os
 import sys
 
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
+from ramsey import __main__ as cli
 from ramsey import symmetry
 from ramsey.cycles import cycle_count, cycle_edges, cycles, edges
 from ramsey.encode import Encoding
@@ -39,7 +44,74 @@ PUBLISHED = {
     (3, 6, 6): 15,
 }
 
+# Every evidence file the README and PREFLIGHT.md rely on, with the verdict it
+# records. The sections below only look at the records they find, so without
+# this a witness deleted, renamed or downgraded to a timeout would drop out of
+# the check unnoticed, and a timeout rewritten as an UNSAT nobody can re-check
+# would pass as an upper bound. Adding evidence means adding it here as well.
+CLAIMED_EVIDENCE = {
+    '3-4-6_n12.json': 'SAT_WITNESS_VERIFIED',
+    '3-4-6_n12_sb.json': 'SAT_WITNESS_VERIFIED',
+    '3-6-6_n14.json': 'SAT_WITNESS_VERIFIED',
+    '3-6-6_n14_sb.json': 'SAT_WITNESS_VERIFIED',
+    '4-6-6_n10.json': 'SAT_WITNESS_VERIFIED',
+    '4-6-6_n10_sb.json': 'SAT_WITNESS_VERIFIED',
+    '4-6-6_n11.json': 'TIMEOUT',
+    '4-6-6_n11_sb.json': 'TIMEOUT',
+    '6-6-6_n11.json': 'SAT_WITNESS_VERIFIED',
+    '6-6-6_n12_sb.json': 'TIMEOUT',
+}
+
 passed = failed = 0
+
+
+def record_problems(name, rec):
+    """Everything inconsistent inside one evidence record, as reasons.
+
+    The size is recomputed from the definition, not by building the encoding:
+    four clauses per edge, one per target cycle, and three per consecutive
+    pair of star edges when the sorted-star break is on. The verdict has to
+    agree with the solver's return code, since that is what it was read from.
+    """
+    problems = []
+    n, targets = rec['n'], tuple(rec['targets'])
+    a, b, c = targets
+    broken = name.endswith('_sb.json')
+    stem = f'{a}-{b}-{c}_n{n}' + ('_sb' if broken else '') + '.json'
+    if name != stem:
+        problems.append(f'file name does not match n={n}, targets={targets}')
+    if rec.get('problem') != f'R(C{a},C{b},C{c})':
+        problems.append(f'problem {rec.get("problem")!r} does not match the targets')
+    encoding = ('one-hot, sorted-star symmetry break' if broken
+                else 'one-hot, no symmetry breaking')
+    if rec.get('encoding') != encoding:
+        problems.append(f'encoding {rec.get("encoding")!r} does not match the file name')
+    extra = 3 * (n - 2) if broken else 0
+    if rec.get('symmetry_clauses', 0) != extra:
+        problems.append(f'{rec.get("symmetry_clauses")} symmetry clauses, not {extra}')
+    m = len(edges(n))
+    if rec.get('vars') != 3 * m:
+        problems.append(f'{rec.get("vars")} variables, not {3 * m}')
+    clauses = 4 * m + sum(cycle_count(n, L) for L in targets) + extra
+    if rec.get('clauses') != clauses:
+        problems.append(f'{rec.get("clauses")} clauses, not {clauses}')
+    verdict = rec.get('verdict')
+    if verdict == 'SAT_WITNESS_VERIFIED':
+        if (rec.get('returncode'), rec.get('sat'), rec.get('timed_out')) != (10, True, False):
+            problems.append('a verified witness needs returncode 10, sat true, '
+                            'timed_out false')
+        if 'colouring' not in rec:
+            problems.append('a verified witness carries no colouring')
+    elif verdict == 'TIMEOUT':
+        if rec.get('returncode') is not None or rec.get('timed_out') is not True:
+            problems.append('a timeout needs returncode null and timed_out true')
+        if 'sat' in rec or 'colouring' in rec:
+            problems.append('a timeout decided nothing, so records no answer')
+    else:
+        # An UNSAT has no certificate on disk here, so the gate cannot check
+        # it, and a claim it cannot check must not come out as a pass.
+        problems.append(f'verdict {verdict!r} is not one this gate can re-check')
+    return problems
 
 
 def check(label, ok):
@@ -136,8 +208,47 @@ def main():
     check('breaking one edge of it makes the 6-cycle vanish',
           find_cycle(n, broken, 0, 6) is None)
 
-    section('stored witnesses re-verify, and mutations of them do not')
+    section('the evidence on disk is exactly what is claimed, and consistent')
     records = sorted(glob.glob(os.path.join(EVIDENCE, '*.json')))
+    on_disk = {os.path.basename(p) for p in records}
+    check(f'evidence files are exactly the {len(CLAIMED_EVIDENCE)} claimed '
+          f'(missing {sorted(set(CLAIMED_EVIDENCE) - on_disk)}, '
+          f'unexpected {sorted(on_disk - set(CLAIMED_EVIDENCE))})',
+          on_disk == set(CLAIMED_EVIDENCE))
+    for path in records:
+        with open(path, encoding='utf-8') as fh:
+            rec = json.load(fh)
+        name = os.path.basename(path)
+        claimed = CLAIMED_EVIDENCE.get(name)
+        check(f'{name}: verdict {rec.get("verdict")} is the one claimed ({claimed})',
+              rec.get('verdict') == claimed)
+        problems = record_problems(name, rec)
+        check(f'{name}: size, name and verdict agree with each other'
+              + (f' ({"; ".join(problems)})' if problems else ''), not problems)
+
+    section('the record check can fail')
+    # The same break-it-on-purpose rule as for the witness checker: each of
+    # these edits to a real record must be reported.
+    with open(os.path.join(EVIDENCE, '3-6-6_n14_sb.json'), encoding='utf-8') as fh:
+        good = json.load(fh)
+    with open(os.path.join(EVIDENCE, '4-6-6_n11.json'), encoding='utf-8') as fh:
+        timeout = json.load(fh)
+    edits = [
+        ('3-6-6_n14_sb.json', good, 'clauses', good['clauses'] + 1),
+        ('3-6-6_n14_sb.json', good, 'vars', good['vars'] + 3),
+        ('3-6-6_n14_sb.json', good, 'symmetry_clauses', 0),
+        ('3-6-6_n14_sb.json', good, 'returncode', 20),
+        ('3-6-6_n14_sb.json', good, 'problem', 'R(C3,C6,C5)'),
+        ('3-6-6_n14.json', good, 'n', good['n']),
+        ('4-6-6_n11.json', timeout, 'verdict', 'UNSAT'),
+        ('4-6-6_n11.json', timeout, 'returncode', 20),
+    ]
+    for name, rec, key, value in edits:
+        mutated = dict(rec, **{key: value})
+        check(f'{name} with {key}={value!r} is reported',
+              bool(record_problems(name, mutated)))
+
+    section('stored witnesses re-verify, and mutations of them do not')
     checked = 0
     for path in records:
         with open(path, encoding='utf-8') as fh:
@@ -216,6 +327,38 @@ def main():
               rec['n'] < value)
     check(f'at least one witness was compared to a published value '
           f'({compared} found)', compared > 0)
+
+    section('the command line reports what the gate decided')
+    # `ramsey verify` once printed GATE FAILED and exited 0: it waited for a
+    # SystemExit that main() never raises. This is checked with main() stubbed
+    # out, since calling the real one from here would recurse.
+    gate = importlib.import_module('ramsey.verify_all')
+    real = gate.main
+    try:
+        gate.main = lambda: 1
+        status = cli.cmd_verify(None)
+    finally:
+        gate.main = real
+    check(f'ramsey verify exits non-zero when the gate fails (exit {status})',
+          status == 1)
+    # `ramsey solve` read its verdict from keys solve() never writes, so it
+    # never said what a verdict meant. Checked with solve() stubbed out, since
+    # a real run needs kissat.
+    solver = importlib.import_module('ramsey.solve')
+    real = solver.solve
+    for verdict, says in [('SAT_WITNESS_VERIFIED', 'so R > 9'),
+                          ('UNSAT', 'so R <= 9')]:
+        err = io.StringIO()
+        try:
+            solver.solve = lambda *a, verdict=verdict, **k: {'verdict': verdict}
+            args = argparse.Namespace(n=9, targets='3,6,6', kissat=None,
+                                      timeout=None, keep_cnf=False, symmetry=False)
+            with contextlib.redirect_stdout(io.StringIO()), \
+                    contextlib.redirect_stderr(err):
+                cli.cmd_solve(args)
+        finally:
+            solver.solve = real
+        check(f'ramsey solve explains {verdict} as "{says}"', says in err.getvalue())
 
     print(f'\n{passed} passed / {failed} failed')
     if failed:

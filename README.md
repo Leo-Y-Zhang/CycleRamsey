@@ -67,7 +67,7 @@ python ramsey/verify_all.py
 Python 3.13, which is what CI runs and what `ruff.toml` targets. Nothing is
 installed and there are no third-party packages.
 
-101 checks, no solver required: the enumeration is compared against a formula,
+103 checks, no solver required: the enumeration is compared against a formula,
 the witness checker is made to catch a planted cycle and to miss it once an
 edge is broken, every stored colouring is re-verified and then mutated edge by
 edge to confirm the check can actually fail, both the encoder and the checker

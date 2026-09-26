@@ -65,6 +65,11 @@ CLAIMED_EVIDENCE = {
 passed = failed = 0
 
 
+def same(value, expected):
+    """Equal and of the same JSON type: 1.0 == 1 and True == 1 in Python."""
+    return type(value) is type(expected) and value == expected
+
+
 def record_problems(name, rec):
     """Everything inconsistent inside one evidence record, as reasons.
 
@@ -87,17 +92,18 @@ def record_problems(name, rec):
     if rec.get('encoding') != encoding:
         problems.append(f'encoding {rec.get("encoding")!r} does not match the file name')
     extra = 3 * (n - 2) if broken else 0
-    if rec.get('symmetry_clauses', 0) != extra:
+    if not same(rec.get('symmetry_clauses', 0), extra):
         problems.append(f'{rec.get("symmetry_clauses")} symmetry clauses, not {extra}')
     m = len(edges(n))
-    if rec.get('vars') != 3 * m:
+    if not same(rec.get('vars'), 3 * m):
         problems.append(f'{rec.get("vars")} variables, not {3 * m}')
     clauses = 4 * m + sum(cycle_count(n, L) for L in targets) + extra
-    if rec.get('clauses') != clauses:
+    if not same(rec.get('clauses'), clauses):
         problems.append(f'{rec.get("clauses")} clauses, not {clauses}')
     verdict = rec.get('verdict')
     if verdict == 'SAT_WITNESS_VERIFIED':
-        if (rec.get('returncode'), rec.get('sat'), rec.get('timed_out')) != (10, True, False):
+        if not all(same(rec.get(k), v) for k, v in
+                   (('returncode', 10), ('sat', True), ('timed_out', False))):
             problems.append('a verified witness needs returncode 10, sat true, '
                             'timed_out false')
         if 'colouring' not in rec:
@@ -238,6 +244,8 @@ def main():
         ('3-6-6_n14_sb.json', good, 'vars', good['vars'] + 3),
         ('3-6-6_n14_sb.json', good, 'symmetry_clauses', 0),
         ('3-6-6_n14_sb.json', good, 'returncode', 20),
+        ('3-6-6_n14_sb.json', good, 'clauses', float(good['clauses'])),
+        ('3-6-6_n14_sb.json', good, 'sat', 1),
         ('3-6-6_n14_sb.json', good, 'problem', 'R(C3,C6,C5)'),
         ('3-6-6_n14.json', good, 'n', good['n']),
         ('4-6-6_n11.json', timeout, 'verdict', 'UNSAT'),

@@ -34,11 +34,9 @@ import sys
 
 def cmd_verify(args) -> int:
     from . import verify_all
-    try:
-        verify_all.main()
-    except SystemExit as exc:
-        return int(exc.code or 0)
-    return 0
+    # main() returns the exit status rather than raising SystemExit, so it has
+    # to be passed on; discarding it made a failed gate exit 0.
+    return verify_all.main()
 
 
 def cmd_solve(args) -> int:
@@ -50,8 +48,8 @@ def cmd_solve(args) -> int:
     record = solve(args.n, targets, kissat=args.kissat, timeout=args.timeout,
                    keep=args.keep_cnf, break_symmetry=args.symmetry)
     print(json.dumps(record, indent=1))
-    verdict = record.get("result") or record.get("status")
-    if verdict == "SAT":
+    verdict = record["verdict"]
+    if verdict == "SAT_WITNESS_VERIFIED":
         print(f"\nsatisfiable: a good colouring of K_{args.n} exists, "
               f"so R > {args.n}", file=sys.stderr)
     elif verdict == "UNSAT":

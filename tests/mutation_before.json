@@ -1,0 +1,569 @@
+[
+  {
+    "id": "verify_witness:triangle-boundary",
+    "module": "ramsey/verify_witness.py",
+    "old": "length < 3 or length > n",
+    "new": "length <= 3 or length > n",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_witness:spanning-boundary",
+    "module": "ramsey/verify_witness.py",
+    "old": "length < 3 or length > n",
+    "new": "length < 3 or length >= n",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_witness:omit-reverse-adjacency",
+    "module": "ramsey/verify_witness.py",
+    "old": "adj[w].add(u)",
+    "new": "pass",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_witness:accept-open-path",
+    "module": "ramsey/verify_witness.py",
+    "old": "return list(path) if start in adj[path[-1]] else None",
+    "new": "return list(path)",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_witness:walk-guard-and",
+    "module": "ramsey/verify_witness.py",
+    "old": "nxt <= start or nxt in seen",
+    "new": "nxt <= start and nxt in seen",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_witness:accept-extra-edge",
+    "module": "ramsey/verify_witness.py",
+    "old": "len(colouring) != expected",
+    "new": "len(colouring) < expected",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_witness:wrong-edge-count",
+    "module": "ramsey/verify_witness.py",
+    "old": "n * (n - 1) // 2",
+    "new": "n * (n + 1) // 2",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_witness:skip-missing-edge",
+    "module": "ramsey/verify_witness.py",
+    "old": "if (u, w) not in colouring:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_witness:accept-invalid-colour",
+    "module": "ramsey/verify_witness.py",
+    "old": "if colouring[(u, w)] not in (0, 1, 2):",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_witness:accept-forbidden-cycle",
+    "module": "ramsey/verify_witness.py",
+    "old": "if found is not None:\n            raise AssertionError",
+    "new": "if False:\n            raise AssertionError",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_witness:is-good-swallow-rejection",
+    "module": "ramsey/verify_witness.py",
+    "old": "except AssertionError:\n        return False",
+    "new": "except AssertionError:\n        return True",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:same-ignore-type",
+    "module": "ramsey/verify_all.py",
+    "old": "type(value) is type(expected) and value == expected",
+    "new": "value == expected",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:ignore-name",
+    "module": "ramsey/verify_all.py",
+    "old": "if name != stem:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_all:ignore-problem",
+    "module": "ramsey/verify_all.py",
+    "old": "if rec.get('problem') != f'R(C{a},C{b},C{c})':",
+    "new": "if False:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:ignore-encoding",
+    "module": "ramsey/verify_all.py",
+    "old": "if rec.get('encoding') != encoding:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_all:ignore-symmetry-count",
+    "module": "ramsey/verify_all.py",
+    "old": "if not same(rec.get('symmetry_clauses', 0), extra):",
+    "new": "if False:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:ignore-variable-count",
+    "module": "ramsey/verify_all.py",
+    "old": "if not same(rec.get('vars'), 3 * m):",
+    "new": "if False:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:ignore-clause-count",
+    "module": "ramsey/verify_all.py",
+    "old": "if not same(rec.get('clauses'), clauses):",
+    "new": "if False:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:sat-any-field",
+    "module": "ramsey/verify_all.py",
+    "old": "if not all(same(rec.get(k), v) for k, v in",
+    "new": "if not any(same(rec.get(k), v) for k, v in",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:sat-no-witness",
+    "module": "ramsey/verify_all.py",
+    "old": "if 'colouring' not in rec:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_all:timeout-and",
+    "module": "ramsey/verify_all.py",
+    "old": "rec.get('returncode') is not None or rec.get('timed_out') is not True",
+    "new": "rec.get('returncode') is not None and rec.get('timed_out') is not True",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "verify_all:timeout-ignore-flag",
+    "module": "ramsey/verify_all.py",
+    "old": "rec.get('returncode') is not None or rec.get('timed_out') is not True",
+    "new": "rec.get('returncode') is not None",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_all:timeout-answer-and",
+    "module": "ramsey/verify_all.py",
+    "old": "if 'sat' in rec or 'colouring' in rec:",
+    "new": "if 'sat' in rec and 'colouring' in rec:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "verify_all:accept-uncertified-verdict",
+    "module": "ramsey/verify_all.py",
+    "old": "problems.append(f'verdict {verdict!r} is not one this gate can re-check')",
+    "new": "pass",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "encode:accept-target-arity",
+    "module": "ramsey/encode.py",
+    "old": "if len(targets) != NUM_COLOURS:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:reject-triangles",
+    "module": "ramsey/encode.py",
+    "old": "if any(t < 3 for t in targets):",
+    "new": "if any(t <= 3 for t in targets):",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "encode:zero-based-vars",
+    "module": "ramsey/encode.py",
+    "old": "self.edge_index[edge] + colour + 1",
+    "new": "self.edge_index[edge] + colour + 0",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:colour-sign",
+    "module": "ramsey/encode.py",
+    "old": "self.edge_index[edge] + colour + 1",
+    "new": "self.edge_index[edge] - colour + 1",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:at-least-one-sign",
+    "module": "ramsey/encode.py",
+    "old": "[self.var(e, c) for c in range(NUM_COLOURS)]",
+    "new": "[-self.var(e, c) for c in range(NUM_COLOURS)]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:at-most-one-sign",
+    "module": "ramsey/encode.py",
+    "old": "[-self.var(e, c1), -self.var(e, c2)]",
+    "new": "[-self.var(e, c1), self.var(e, c2)]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:cycle-clause-sign",
+    "module": "ramsey/encode.py",
+    "old": "[-self.var(e, colour) for e in cycle_edges(cyc)]",
+    "new": "[self.var(e, colour) for e in cycle_edges(cyc)]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:cycle-clause-truncated",
+    "module": "ramsey/encode.py",
+    "old": "for e in cycle_edges(cyc)]",
+    "new": "for e in cycle_edges(cyc)[:-1]]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:model-negative-literals",
+    "module": "ramsey/encode.py",
+    "old": "if v > 0}",
+    "new": "if v < 0}",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:model-accept-multiple",
+    "module": "ramsey/encode.py",
+    "old": "if len(assigned) != 1:",
+    "new": "if len(assigned) < 1:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:model-accept-missing",
+    "module": "ramsey/encode.py",
+    "old": "if len(assigned) != 1:",
+    "new": "if len(assigned) > 1:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:dimacs-variable-count",
+    "module": "ramsey/encode.py",
+    "old": "{self.num_vars} {len(self.clauses)}",
+    "new": "{self.num_vars + 1} {len(self.clauses)}",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:dimacs-clause-count",
+    "module": "ramsey/encode.py",
+    "old": "{self.num_vars} {len(self.clauses)}",
+    "new": "{self.num_vars} {len(self.clauses) - 1}",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "encode:dimacs-no-terminator",
+    "module": "ramsey/encode.py",
+    "old": "fh.write(' 0\\n')",
+    "new": "fh.write('\\n')",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "cycles:omit-triangles",
+    "module": "ramsey/cycles.py",
+    "old": "if length < 3 or length > n:",
+    "new": "if length <= 3 or length > n:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "cycles:omit-spanning-cycles",
+    "module": "ramsey/cycles.py",
+    "old": "if length < 3 or length > n:",
+    "new": "if length < 3 or length >= n:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "cycles:duplicate-orientations",
+    "module": "ramsey/cycles.py",
+    "old": "if tail[0] < tail[-1]:",
+    "new": "if True:",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "cycles:double-count",
+    "module": "ramsey/cycles.py",
+    "old": "factorial(length - 1) // 2",
+    "new": "factorial(length - 1) // 1",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "cycles:skip-cycle-neighbour",
+    "module": "ramsey/cycles.py",
+    "old": "(i + 1) % len(cycle)",
+    "new": "(i + 2) % len(cycle)",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "cycles:omit-last-vertex",
+    "module": "ramsey/cycles.py",
+    "old": "combinations(range(n), 2)",
+    "new": "combinations(range(n - 1), 2)",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "symmetry:forbid-equal-colours",
+    "module": "ramsey/symmetry.py",
+    "old": "for lo in range(hi):",
+    "new": "for lo in range(hi + 1):",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "symmetry:omit-blue-comparisons",
+    "module": "ramsey/symmetry.py",
+    "old": "for hi in range(1, 3):",
+    "new": "for hi in range(1, 2):",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "symmetry:comparison-sign",
+    "module": "ramsey/symmetry.py",
+    "old": "[-enc.var(a, hi), -enc.var(b, lo)]",
+    "new": "[-enc.var(a, hi), enc.var(b, lo)]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "symmetry:do-not-apply",
+    "module": "ramsey/symmetry.py",
+    "old": "enc.clauses.extend(extra)",
+    "new": "pass",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "symmetry:reverse-star",
+    "module": "ramsey/symmetry.py",
+    "old": "key=lambda v: colouring[tuple(sorted((0, v)))]",
+    "new": "key=lambda v: -colouring[tuple(sorted((0, v)))]",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "symmetry:mapping-off-by-one",
+    "module": "ramsey/symmetry.py",
+    "old": "enumerate(order, start=1)",
+    "new": "enumerate(order, start=0)",
+    "gate_status": 1,
+    "pytest_status": null,
+    "killed": true
+  },
+  {
+    "id": "solve:parse-status-as-model",
+    "module": "ramsey/solve.py",
+    "old": "line.startswith('v ')",
+    "new": "line.startswith('s ')",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:parse-only-zero",
+    "module": "ramsey/solve.py",
+    "old": "if x != 0]",
+    "new": "if x == 0]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:drop-negative-literals",
+    "module": "ramsey/solve.py",
+    "old": "if x != 0]",
+    "new": "if x > 0]",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:invert-timeout",
+    "module": "ramsey/solve.py",
+    "old": "if result['timeout']:",
+    "new": "if not result['timeout']:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:invert-unsat",
+    "module": "ramsey/solve.py",
+    "old": "elif result['returncode'] == UNSAT:",
+    "new": "elif result['returncode'] != UNSAT:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:invert-sat",
+    "module": "ramsey/solve.py",
+    "old": "elif result['returncode'] == SAT:",
+    "new": "elif result['returncode'] != SAT:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:skip-witness-verification",
+    "module": "ramsey/solve.py",
+    "old": "check_colouring(n, colouring, targets)",
+    "new": "pass",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "solve:serialize-wrong-order",
+    "module": "ramsey/solve.py",
+    "old": "str(colouring[e]) for e in enc.edges",
+    "new": "str(colouring[e]) for e in reversed(enc.edges)",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "__main__:check-length-inverted",
+    "module": "ramsey/__main__.py",
+    "old": "if len(raw) != len(order):",
+    "new": "if len(raw) == len(order):",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "__main__:check-length-off-by-one",
+    "module": "ramsey/__main__.py",
+    "old": "if len(raw) != len(order):",
+    "new": "if len(raw) < len(order):",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "__main__:check-accept-bad",
+    "module": "ramsey/__main__.py",
+    "old": "if not good:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "__main__:check-no-witness",
+    "module": "ramsey/__main__.py",
+    "old": "if raw is None:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  },
+  {
+    "id": "__main__:check-accept-suspect",
+    "module": "ramsey/__main__.py",
+    "old": "if not broke:",
+    "new": "if False:",
+    "gate_status": 0,
+    "pytest_status": null,
+    "killed": false
+  }
+]

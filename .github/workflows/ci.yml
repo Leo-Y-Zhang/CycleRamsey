@@ -27,6 +27,8 @@ jobs:
         with:
           python-version: "3.13"
       - run: python ramsey/verify_all.py
+      - run: pip install pytest==8.4.2
+      - run: pytest -q
 
   # Pinned deliberately, and to the version ruff.toml was validated against. An
   # unpinned lint grades the code against whatever shipped that morning, which
